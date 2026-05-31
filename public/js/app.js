@@ -235,20 +235,11 @@ async function fetchAndRenderChart(ticker) {
   container.innerHTML = '<p style="color:#999;padding:1rem">載入股價資料中…</p>'
 
   try {
-    const symbol = ticker + '.TW'
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`
-    const res = await fetch(url)
+    const res = await fetch(`/api/price/${ticker}`)
     const json = await res.json()
-    const result = json.chart?.result?.[0]
-    if (!result) throw new Error('no data')
+    if (!res.ok || !json.data) throw new Error(json.error ?? 'no data')
 
-    const timestamps = result.timestamp
-    const closes = result.indicators.quote[0].close
-
-    const chartData = timestamps.map((t, i) => ({
-      time: t,
-      value: closes[i] ?? null
-    })).filter(d => d.value !== null)
+    const chartData = json.data
 
     container.innerHTML = ''
     const chart = LightweightCharts.createChart(container, {
