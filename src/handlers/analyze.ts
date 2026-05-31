@@ -39,12 +39,15 @@ export async function analyzeHandler(c: Context<{ Bindings: Bindings }>) {
 
   if (pdfs.length === 0) return c.json({ error: '請至少上傳一份財報 PDF' }, 400)
 
+  const apiKey = c.env.ANTHROPIC_API_KEY
+  if (!apiKey) return c.json({ error: 'API 金鑰未設定，請聯絡管理員' }, 500)
+
   try {
     const result = await analyzeFinancialReport({
       stockCode,
       quarters,
       pdfs,
-      apiKey: c.env.ANTHROPIC_API_KEY,
+      apiKey,
     })
     return c.json(result)
   } catch (err) {
