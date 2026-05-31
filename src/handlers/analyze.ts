@@ -21,8 +21,7 @@ export async function analyzeHandler(c: Context<{ Bindings: Bindings }>) {
     return c.json({ error: '請求格式錯誤' }, 400)
   }
 
-  const stockCode = (formData.get('stockCode') as string | null)?.trim()
-  if (!stockCode) return c.json({ error: '請輸入股票代碼' }, 400)
+  const stockCode = (formData.get('stockCode') as string | null)?.trim() ?? ''
 
   const pdfs: { quarter: string; base64: string }[] = []
   const quarters: string[] = []

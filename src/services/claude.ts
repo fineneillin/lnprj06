@@ -41,6 +41,7 @@ export interface Trends {
 export interface FinancialAnalysis {
   company: string
   stockCode: string
+  tickerSymbol?: string | null
   periods: string[]
   isMultiQuarter: boolean
   metrics: {

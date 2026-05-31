@@ -51,18 +51,15 @@ QUARTER_KEYS.forEach(q => {
 document.getElementById('analyzeForm').addEventListener('submit', async e => {
   e.preventDefault()
 
-  const stockCode = document.getElementById('stockCode').value.trim()
-  const hasAny    = QUARTER_KEYS.some(q => document.getElementById(`pdf_${q}`).files[0])
+  const hasAny = QUARTER_KEYS.some(q => document.getElementById(`pdf_${q}`).files[0])
 
   setError('')
-  if (!stockCode) return setError('請輸入股票代碼')
-  if (!hasAny)    return setError('請至少上傳一份財報 PDF')
+  if (!hasAny) return setError('請至少上傳一份財報 PDF')
 
   showLoading(true)
 
   try {
     const fd = new FormData()
-    fd.append('stockCode', stockCode)
     QUARTER_KEYS.forEach(q => {
       const file = document.getElementById(`pdf_${q}`).files[0]
       if (file) fd.append(`pdf_${q}`, file)
@@ -84,6 +81,11 @@ function renderResults(data) {
   const resultsEl = document.getElementById('results')
   resultsEl.style.display = 'block'
   resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+  // 股價走勢圖
+  if (data.tickerSymbol) {
+    fetchAndRenderChart(data.tickerSymbol)
+  }
 
   // Header
   document.getElementById('companyName').textContent = `${data.company}（${data.stockCode}）`
@@ -223,4 +225,58 @@ function setError(msg) {
   const el = document.getElementById('errorBox')
   el.textContent   = msg
   el.style.display = msg ? 'block' : 'none'
+}
+
+// ── Price Chart ─────────────────────────────────────────────────
+async function fetchAndRenderChart(ticker) {
+  const section = document.getElementById('priceChartSection')
+  section.style.display = 'block'
+  const container = document.getElementById('priceChart')
+  container.innerHTML = '<p style="color:#999;padding:1rem">載入股價資料中…</p>'
+
+  try {
+    const symbol = ticker + '.TW'
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`
+    const res = await fetch(url)
+    const json = await res.json()
+    const result = json.chart?.result?.[0]
+    if (!result) throw new Error('no data')
+
+    const timestamps = result.timestamp
+    const closes = result.indicators.quote[0].close
+
+    const chartData = timestamps.map((t, i) => ({
+      time: t,
+      value: closes[i] ?? null
+    })).filter(d => d.value !== null)
+
+    container.innerHTML = ''
+    const chart = LightweightCharts.createChart(container, {
+      width: container.clientWidth,
+      height: 260,
+      layout: {
+        background: { color: 'transparent' },
+        textColor: '#888',
+      },
+      grid: {
+        vertLines: { color: 'rgba(0,0,0,0.05)' },
+        horzLines: { color: 'rgba(0,0,0,0.05)' },
+      },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true },
+    })
+
+    const lineSeries = chart.addLineSeries({
+      color: '#2563eb',
+      lineWidth: 2,
+    })
+    lineSeries.setData(chartData)
+    chart.timeScale().fitContent()
+
+    window.addEventListener('resize', () => {
+      chart.applyOptions({ width: container.clientWidth })
+    })
+  } catch {
+    container.innerHTML = '<p style="color:#999;padding:1rem">股價資料暫時無法載入</p>'
+  }
 }
