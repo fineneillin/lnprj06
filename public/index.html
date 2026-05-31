@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>台股財報分析 · LNPRJ06</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a class="logo" href="https://lnprj.neillin-lct.workers.dev/">
+        <strong>LNPRJ</strong><span>/ 台股財報分析</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- Upload Form -->
+      <div class="card">
+        <h2>上傳財報 PDF 進行 AI 分析</h2>
+        <form id="analyzeForm">
+
+          <div class="form-field">
+            <label for="stockCode">股票代碼</label>
+            <input type="text" id="stockCode" placeholder="如 2330" maxlength="10" />
+          </div>
+
+          <div class="quarters-label">財報季度（至少上傳 1 份，最多 4 份）</div>
+          <div class="quarters-grid">
+            <div class="quarter-zone" id="zone_q1">
+              <input type="file" id="pdf_q1" accept=".pdf,application/pdf" />
+              <div class="quarter-badge">Q1</div>
+              <div class="quarter-icon">📄</div>
+              <div class="quarter-filename" id="qname_q1">選填，點擊上傳</div>
+            </div>
+            <div class="quarter-zone" id="zone_q2">
+              <input type="file" id="pdf_q2" accept=".pdf,application/pdf" />
+              <div class="quarter-badge">Q2</div>
+              <div class="quarter-icon">📄</div>
+              <div class="quarter-filename" id="qname_q2">選填，點擊上傳</div>
+            </div>
+            <div class="quarter-zone" id="zone_q3">
+              <input type="file" id="pdf_q3" accept=".pdf,application/pdf" />
+              <div class="quarter-badge">Q3</div>
+              <div class="quarter-icon">📄</div>
+              <div class="quarter-filename" id="qname_q3">選填，點擊上傳</div>
+            </div>
+            <div class="quarter-zone" id="zone_q4">
+              <input type="file" id="pdf_q4" accept=".pdf,application/pdf" />
+              <div class="quarter-badge">Q4</div>
+              <div class="quarter-icon">📄</div>
+              <div class="quarter-filename" id="qname_q4">選填，點擊上傳</div>
+            </div>
+          </div>
+
+          <div class="error-box" id="errorBox"></div>
+          <button type="submit" class="btn-primary" id="submitBtn">開始分析</button>
+        </form>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading">
+        <div class="spinner"></div>
+        <p>AI 正在分析財報，約需 20–40 秒…</p>
+      </div>
+
+      <!-- Results -->
+      <div id="results">
+        <div class="card">
+
+          <div class="result-header">
+            <div class="result-title">
+              <h3 id="companyName"></h3>
+              <div class="period" id="periodLabel"></div>
+            </div>
+          </div>
+
+          <div class="metrics-grid" id="metricsGrid"></div>
+
+          <div id="scoreCard"></div>
+
+          <div id="quarterlySection"></div>
+
+          <div class="insights-grid">
+            <div class="insight-card highlights">
+              <h4>財務亮點</h4>
+              <ul id="highlightsList"></ul>
+            </div>
+            <div class="insight-card risks">
+              <h4>風險因素</h4>
+              <ul id="risksList"></ul>
+            </div>
+          </div>
+
+          <div class="outlook-card">
+            <h4>整體展望</h4>
+            <p id="outlookText"></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+<script src="https://lnprj.neillin-lct.workers.dev/lnprj-nav.js"></script>
+<script>LNPRJ.init({ current: 6, basePath: '../../' });</script>
+</body>
+</html>
